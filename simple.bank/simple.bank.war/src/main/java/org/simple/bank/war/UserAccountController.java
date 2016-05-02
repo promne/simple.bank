@@ -45,10 +45,6 @@ public class UserAccountController {
         return userAccounts;
     }
 
-    public void createNewAccount(UserAccount userAccount) {
-        bankService.createNewAccount(userAccount);
-    }
-    
     public void deleteAccount(Account account) {
         bankService.deleteAccount(account);
     }

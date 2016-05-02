@@ -3,7 +3,9 @@ package org.simple.bank.war.impl;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -49,6 +51,8 @@ public class DemoDataInsert {
                 for (int j=0; j<2; j++) {                
                     Account account = new Account();
                     account.setNumber(i+"-"+j);
+                    List<String> currencyList = Arrays.asList("CZK", "NZD");
+                    account.setCurrencyCode(currencyList.get((i+j)%currencyList.size()));
                     account.setBalance(new BigDecimal(123_456));
                     account.setTransactions(new ArrayList<>());
                     em.persist(account);

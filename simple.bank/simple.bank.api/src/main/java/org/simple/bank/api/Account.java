@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.PrePersist;
 
 @Entity
 public class Account {
@@ -17,6 +18,8 @@ public class Account {
     
     private BigDecimal balance;
     
+    private String currencyCode;
+    
     @OneToMany
     @OrderBy(Transaction.PROPERTY_DATE + " DESC")
     private List<Transaction> transactions;
@@ -26,9 +29,10 @@ public class Account {
         super();
     }
 
-    public Account(String number, BigDecimal balance) {
+    public Account(String number, String currencyCode, BigDecimal balance) {
         super();
         this.number = number;
+        this.currencyCode = currencyCode;
         this.balance = balance;
     }
 
@@ -38,6 +42,14 @@ public class Account {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public BigDecimal getBalance() {
@@ -54,6 +66,11 @@ public class Account {
 
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+    @PrePersist
+    private void beforePerist() {
+        currencyCode = currencyCode.toUpperCase();
     }
     
 }

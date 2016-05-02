@@ -58,6 +58,10 @@ public class BankService {
             remoteTransaction.setFromAccount(transaction.getFromAccount());
             remoteTransaction.setToAccount(transaction.getToAccount());
                     
+            if (!account.getCurrencyCode().equalsIgnoreCase(from.get().getCurrencyCode())) {
+                remoteTransaction.setDetail(remoteTransaction.getDetail() + " // converted from " + from.get().getCurrencyCode());
+            }
+            
             em.persist(remoteTransaction);
             
             account.setBalance(account.getBalance().add(remoteTransaction.getAmount()));
@@ -66,8 +70,9 @@ public class BankService {
         }
     }
 
-    public Account createNewAccount(UserAccount userAccount) {
-        Account account = new Account(BankAccountNumberGenerator.generate(), BigDecimal.ZERO);
+    public Account createNewAccount(String accountNumber, String currencyCode, UserAccount userAccount) {
+        String accNum = accountNumber!=null && accountNumber.length()>0 ? accountNumber : BankAccountNumberGenerator.generate();
+        Account account = new Account(accNum, currencyCode, BigDecimal.ZERO);
         em.persist(account);
         
         userAccount.getAccounts().add(account);

@@ -60,7 +60,7 @@ public class ClientBankApiImpl implements ClientBankApi {
 
     @Override
     public List<Account> listAccounts(String authToken) {
-        return em.find(UserAccount.class, getSession(authToken).username).getAccounts().stream().map(a -> new Account(a.getNumber(), a.getBalance())).collect(Collectors.toList());
+        return em.find(UserAccount.class, getSession(authToken).username).getAccounts().stream().map(a -> new Account(a.getNumber(), a.getCurrencyCode(), a.getBalance())).collect(Collectors.toList());
     }
 
     @Override
@@ -104,12 +104,18 @@ public class ClientBankApiImpl implements ClientBankApi {
         
         Account recipientAccount = em.find(Account.class, transaction.getToAccount());
         if (recipientAccount != null) {
+            
             Transaction remoteTransaction = new Transaction();
             remoteTransaction.setAmount(amount);
             remoteTransaction.setDate(new Date());
             remoteTransaction.setDetail(transaction.getDetail());
             remoteTransaction.setFromAccount(accountId);
             remoteTransaction.setToAccount(recipientAccount.getNumber());
+            
+            if (!recipientAccount.getCurrencyCode().equalsIgnoreCase(account.getCurrencyCode())) {
+                remoteTransaction.setDetail(remoteTransaction.getDetail() + " // converted from " + account.getCurrencyCode());
+            }
+
             em.persist(remoteTransaction);
             
             recipientAccount.getTransactions().add(remoteTransaction);

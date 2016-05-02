@@ -32,7 +32,13 @@
         	</h:column>
         	<h:column>
         		<f:facet name="header">Accounts</f:facet>
-        		<h:form><h:commandLink value="New account" action="#{userAccountController.createNewAccount(userAccount)}"/></h:form>
+        		<h:form>
+					<h:outputText value="Number" />
+			        <h:inputText value="#{bankAccount.accountNumber}" />
+					<h:outputText value="Currency" />
+			        <h:inputText value="#{bankAccount.currencyCode}" />        			
+        			<h:commandButton value="Create" action="#{bankAccount.createNewAccount(userAccount)}"/>
+        		</h:form>
 		        <h:dataTable value="#{userAccountController.getAccounts(userAccount.username)}" var="account" styleClass="order-table" headerClass="order-table-header" rowClasses="order-table-odd-row,order-table-even-row" >
 		        	<h:column>
 		        		<f:facet name="header">Number</f:facet>
@@ -42,6 +48,10 @@
 		        	<h:column>
 		        		<f:facet name="header">Balance</f:facet>
 		        		#{account.balance}
+		        	</h:column>
+		        	<h:column>
+		        		<f:facet name="header">Currency</f:facet>
+		        		#{account.currencyCode}
 		        	</h:column>
 		        	<h:column>
 		        		<f:facet name="header">Transactions</f:facet>
