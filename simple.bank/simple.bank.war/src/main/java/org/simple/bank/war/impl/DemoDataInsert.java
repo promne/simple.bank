@@ -34,6 +34,10 @@ public class DemoDataInsert {
 
     @PostConstruct
     private void init() {
+//        initSE();
+    }
+
+    private void initSE() {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<UserAccount> cq = cb.createQuery(UserAccount.class);
         Root<UserAccount> rootEntry = cq.from(UserAccount.class);

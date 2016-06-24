@@ -58,7 +58,7 @@ public class BankService {
             remoteTransaction.setFromAccount(transaction.getFromAccount());
             remoteTransaction.setToAccount(transaction.getToAccount());
                     
-            if (!account.getCurrencyCode().equalsIgnoreCase(from.get().getCurrencyCode())) {
+            if (from.isPresent() && !account.getCurrencyCode().equalsIgnoreCase(from.get().getCurrencyCode())) {
                 remoteTransaction.setDetail(remoteTransaction.getDetail() + " // converted from " + from.get().getCurrencyCode());
             }
             

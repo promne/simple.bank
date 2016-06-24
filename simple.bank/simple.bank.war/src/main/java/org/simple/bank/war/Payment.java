@@ -1,24 +1,14 @@
 package org.simple.bank.war;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.simple.bank.api.Transaction;
 
 @Named
 @RequestScoped
 public class Payment {
     
-    @Inject
-    private BankService bankService;
-    
-    @Inject
-    private UserAccountController userAccountController;
-
     private String fromAccount;
     
     private String toAccount;
@@ -63,14 +53,4 @@ public class Payment {
         this.detail = detail;
     }
 
-    public void submit() {
-        Transaction transaction = new Transaction();
-        transaction.setFromAccount(fromAccount.trim());
-        transaction.setToAccount(toAccount.trim());
-        transaction.setAmount(BigDecimal.ZERO.compareTo(amount)>0 ? amount : amount.negate());
-        transaction.setDate(new Date());
-        transaction.setDetail(detail);
-        bankService.insertTransaction(transaction);
-        userAccountController.init();
-    }
 }

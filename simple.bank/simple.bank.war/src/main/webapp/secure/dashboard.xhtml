@@ -9,9 +9,14 @@
     </h:head>
 	<f:view>
 		<h:form>
-			<h2><h:outputText value="Insert unchecked transaction"/></h2>
+			<div>
+				<h:commandLink action="#{userIdentity.logout}" value="Logout #{userIdentity.username}"/>
+			</div>
+			<h2><h:outputText value="Make transaction"/></h2>
 			<h:outputText value="From" />
-	        <h:inputText value="#{payment.fromAccount}" />
+			<h:selectOneMenu value="#{payment.fromAccount}">
+				<f:selectItems value="#{userAccountController.accounts}" var="a" itemLabel="#{a.number} (#{a.balance} #{a.currencyCode})" itemValue="#{a.number}"/>
+			</h:selectOneMenu>		
 			<h:outputText value="To" />
 	        <h:inputText value="#{payment.toAccount}" />
 			<h:outputText value="Amount" />
@@ -19,31 +24,13 @@
 			<h:outputText value="Detail" />
 	        <h:inputText value="#{payment.detail}" />
 			
-			<h:commandButton value="Submit" action="#{payment.submit}"/>
+			<h:commandButton value="Submit" action="#{userAccountController.submit}"/>
 		</h:form>
-        <h:dataTable value="#{userAccountController.userAccounts}" var="userAccount" styleClass="order-table" headerClass="order-table-header" rowClasses="order-table-odd-row,order-table-even-row">
-        	<h:column>
-        		<f:facet name="header">Username</f:facet>
-        		#{userAccount.username}
-        	</h:column>
-        	<h:column>
-        		<f:facet name="header">Password</f:facet>
-        		#{userAccount.password}
-        	</h:column>
-        	<h:column>
-        		<f:facet name="header">Accounts</f:facet>
-        		<h:form>
-					<h:outputText value="Number" />
-			        <h:inputText value="#{bankAccount.accountNumber}" />
-					<h:outputText value="Currency" />
-			        <h:inputText value="#{bankAccount.currencyCode}" />        			
-        			<h:commandButton value="Create" action="#{bankAccount.createNewAccount(userAccount)}"/>
-        		</h:form>
-		        <h:dataTable value="#{userAccountController.getAccounts(userAccount.username)}" var="account" styleClass="order-table" headerClass="order-table-header" rowClasses="order-table-odd-row,order-table-even-row" >
+        
+		        <h:dataTable value="#{userAccountController.getAccounts()}" var="account" styleClass="order-table" headerClass="order-table-header" rowClasses="order-table-odd-row,order-table-even-row" >
 		        	<h:column>
 		        		<f:facet name="header">Number</f:facet>
 		        		#{account.number}
-		        		<h:form><h:commandLink value="Delete account" action="#{userAccountController.deleteAccount(account)}"/></h:form>
 		        	</h:column>
 		        	<h:column>
 		        		<f:facet name="header">Balance</f:facet>
@@ -85,9 +72,6 @@
 		        	</h:column>
 		        
 		        </h:dataTable>
-        		
-        	</h:column>
-    	</h:dataTable>
 	</f:view>
 
 </html>

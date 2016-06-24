@@ -2,12 +2,14 @@ package org.simple.bank.war;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.simple.bank.api.Account;
 import org.simple.bank.api.Transaction;
@@ -15,28 +17,28 @@ import org.simple.bank.api.UserAccount;
 
 @Named
 @RequestScoped
-public class UserAccountController {
+public class AdminAccountController {
 
     @Inject
     private BankService bankService;
     
     @Inject
-    private UserIdentity userIdentity;
-    
-    @Inject
     private Payment payment;
     
-    private UserAccount userAccount;
+    private List<UserAccount> userAccounts;
+    
+    private Map<String, List<Account>> accounts;
+
+    private Map<String, List<Transaction>> transactions;
+    
+    @Inject
+    private HttpServletRequest httpServletRequest;
     
     @PostConstruct
     public void init() {
-        if (userIdentity.isLoggedIn()) {
-            String username = userIdentity.getUsername();
-            Optional<UserAccount> any = bankService.getUserAccounts().stream().filter(u -> u.getUsername().equals(username)).findAny();
-            if (any.isPresent()) {
-                userAccount = any.get();
-            }
-        }
+        userAccounts = bankService.getUserAccounts();        
+        accounts = userAccounts.stream().collect(Collectors.toMap(UserAccount::getUsername, UserAccount::getAccounts));
+        transactions = accounts.values().stream().flatMap(List::stream).collect(Collectors.toMap(Account::getNumber, Account::getTransactions));
     }
 
     public BankService getBankService() {
@@ -47,33 +49,27 @@ public class UserAccountController {
         this.bankService = bankService;
     }
 
+    public List<UserAccount> getUserAccounts() {
+        return userAccounts;
+    }
+
     public void deleteAccount(Account account) {
         bankService.deleteAccount(account);
     }
     
-    public UserAccount getUserAccount() {
-        return userAccount;
+    public void setUserAccounts(List<UserAccount> userAccounts) {
+        this.userAccounts = userAccounts;
     }
-
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = userAccount;
-    }
-
-    public List<Account> getAccounts() {
-        return userAccount.getAccounts();
+    
+    public List<Account> getAccounts(String username) {
+        return accounts.get(username);
     }
     
     public List<Transaction> getTransactions(String accountNumber) {
-        return getAccounts().stream().filter(a -> a.getNumber().equals(accountNumber)).findAny().get().getTransactions();
+        return transactions.get(accountNumber);
     }
     
     public void submit() {
-        UserAccount userAccount = bankService.getUserAccounts().stream().filter(u -> u.getUsername().equals(userIdentity.getUsername())).findAny().get();
-        
-        if (!userAccount.getAccounts().stream().anyMatch(acc -> acc.getNumber().equals(payment.getFromAccount()))) {
-            throw new IllegalStateException("No! " + payment.getFromAccount() + " is not your account.");
-        }
-        
         Transaction transaction = new Transaction();
         transaction.setFromAccount(payment.getFromAccount().trim());
         transaction.setToAccount(payment.getToAccount().trim());
@@ -82,5 +78,6 @@ public class UserAccountController {
         transaction.setDetail(payment.getDetail());
         bankService.insertTransaction(transaction);
         init();
-    }    
+    }
+    
 }
